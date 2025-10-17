@@ -25,11 +25,11 @@ class Student(models.Model):
         validators=[RegexValidator(r'^[A-Z0-9]+$', 'Student ID must contain only uppercase letters and numbers')]
     )
     
-    # Class Information
+    
     class_room = models.ForeignKey(ClassRoom, on_delete=models.SET_NULL, null=True, blank=True)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
     
-    # Parent/Guardian Information
+
     parent_guardian = models.ForeignKey(
         User, 
         on_delete=models.SET_NULL, 
@@ -39,12 +39,12 @@ class Student(models.Model):
         limit_choices_to={'user_type': 'parent'}
     )
     
-    # Personal Information
+    
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, blank=True)
     medical_conditions = models.TextField(blank=True, help_text="Any medical conditions or allergies")
     
-    # Emergency Contact
+    
     emergency_contact_name = models.CharField(max_length=100)
     emergency_contact_phone = models.CharField(
         max_length=15,
@@ -52,12 +52,12 @@ class Student(models.Model):
     )
     emergency_contact_relation = models.CharField(max_length=50, default='Parent')
     
-    # Academic Information
+    
     admission_date = models.DateField()
     previous_school = models.CharField(max_length=200, blank=True)
     is_active = models.BooleanField(default=True)
     
-    # Timestamps
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -124,7 +124,6 @@ class Student(models.Model):
         super().save(*args, **kwargs)
 
 class StudentDocument(models.Model):
-    """Model to store student documents like certificates, transcripts, etc."""
     DOCUMENT_TYPES = (
         ('birth_certificate', 'Birth Certificate'),
         ('previous_transcript', 'Previous School Transcript'),

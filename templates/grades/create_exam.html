@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Create Exam{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Create Exam</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save Exam</button>
+  </form>
+</div>
+{% endblock %}

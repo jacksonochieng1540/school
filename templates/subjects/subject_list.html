@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Subjects{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Subjects</h2>
+
+    <!-- Search & Filters -->
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search_query }}">
+        </div>
+        <div class="col-md-3">
+            <select name="type" class="form-select">
+                <option value="">All Types</option>
+                <option value="core" {% if subject_type == "core" %}selected{% endif %}>Core</option>
+                <option value="elective" {% if subject_type == "elective" %}selected{% endif %}>Elective</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="grade" class="form-select">
+                <option value="">All Grades</option>
+                {% for grade in grades %}
+                    <option value="{{ grade.id }}" {% if grade_filter == grade.id|stringformat:"s" %}selected{% endif %}>
+                        {{ grade.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-secondary w-100">Filter</button>
+        </div>
+    </form>
+
+    <!-- Subject List -->
+    <div class="row">
+        {% for subject in subjects %}
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ subject.name }}</h5>
+                    <p class="card-text"><strong>Code:</strong> {{ subject.code }}</p>
+                    <p class="card-text">
+                        <strong>Type:</strong> {% if subject.is_core %}Core{% else %}Elective{% endif %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Grades:</strong> {{ subject.grade_count }} |
+                        <strong>Teachers:</strong> {{ subject.teacher_count }}
+                    </p>
+                    <a href="{% url 'subjects:detail' subject.pk %}" class="btn btn-primary btn-sm">View</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <p class="text-muted">No subjects found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            {% if subjects.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ subjects.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% for page_num in subjects.paginator.page_range %}
+                <li class="page-item {% if subjects.number == page_num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+            {% endfor %}
+            {% if subjects.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ subjects.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

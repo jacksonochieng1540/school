@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - School Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="h3 mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Welcome back, {{ user.full_name|default:user.username }}!
+        </h1>
+    </div>
+</div>
+
+<!-- Admin Dashboard -->
+{% if user.user_type == 'admin' %}
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ total_students|default:0 }}</h4>
+                        <p class="mb-0">Total Students</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <!-- MISSING URL: students:list -->
+                <a href="{% url 'students:list' %}" class="text-white text-decoration-none">
+                    <small>View all students <i class="fas fa-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ total_teachers|default:0 }}</h4>
+                        <p class="mb-0">Total Teachers</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <!-- MISSING URL: teachers:list -->
+                <a href="{% url 'teachers:list' %}" class="text-white text-decoration-none">
+                    <small>View all teachers <i class="fas fa-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ total_classes|default:0 }}</h4>
+                        <p class="mb-0">Total Classes</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-school fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <!-- MISSING URL: classes:list -->
+                <a href="{% url 'classes:list' %}" class="text-white text-decoration-none">
+                    <small>View all classes <i class="fas fa-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card dashboard-card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ total_subjects|default:0 }}</h4>
+                        <p class="mb-0">Total Subjects</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <!-- MISSING URL: subjects:list -->
+                <a href="{% url 'subjects:list' %}" class="text-dark text-decoration-none">
+                    <small>View all subjects <i class="fas fa-arrow-right"></i></small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Teacher Dashboard -->
+{% if user.user_type == 'teacher' %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card dashboard-card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ my_classes_count|default:0 }}</h4>
+                        <p class="mb-0">My Classes</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-chalkboard fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card dashboard-card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ my_subjects_count|default:0 }}</h4>
+                        <p class="mb-0">My Subjects</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-book-open fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card dashboard-card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4>{{ my_students_count|default:0 }}</h4>
+                        <p class="mb-0">My Students</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-user-graduate fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Student Dashboard -->
+{% if user.user_type == 'student' %}
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user-graduate me-2"></i>My Class Information</h5>
+            </div>
+            <div class="card-body">
+                {% if my_class %}
+                    <p><strong>Class:</strong> {{ my_class.name }}</p>
+                    <p><strong>Grade:</strong> {{ my_class.grade.name }}</p>
+                    <p><strong>Class Teacher:</strong> {{ my_class.class_teacher.full_name|default:"Not assigned" }}</p>
+                    <p><strong>Academic Year:</strong> {{ my_class.academic_year.year }}</p>
+                {% else %}
+                    <p class="text-muted">You are not assigned to any class yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Academic Performance</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_grades %}
+                    <p><strong>Recent Average:</strong> <span class="badge bg-primary">{{ recent_average|floatformat:1 }}%</span></p>
+                    <p><strong>Total Subjects:</strong> {{ total_subjects }}</p>
+                    <p><strong>Attendance Rate:</strong> <span class="badge bg-success">{{ attendance_rate|floatformat:1 }}%</span></p>
+                {% else %}
+                    <p class="text-muted">No grades available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Main Content Row -->
+<div class="row">
+    <!-- Recent Activity / Quick Actions -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>Recent Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_attendance %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Student</th>
+                                    <th>Status</th>
+                                    <th>Subject</th>
+                                    {% if user.user_type == 'admin' or user.user_type == 'teacher' %}
+                                    <th>Teacher</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in recent_attendance %}
+                                <tr>
+                                    <td>{{ attendance.date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if attendance.student.user.profile_picture %}
+                                                <img src="{{ attendance.student.user.profile_picture.url }}" alt="Profile" class="rounded-circle me-2" width="24" height="24">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                                                    <i class="fas fa-user text-white" style="font-size: 10px;"></i>
+                                                </div>
+                                            {% endif %}
+                                            {{ attendance.student.user.full_name }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge status-{{ attendance.status }}">
+                                            {{ attendance.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ attendance.subject.name|default:"General" }}</td>
+                                    {% if user.user_type == 'admin' or user.user_type == 'teacher' %}
+                                    <td>{{ attendance.teacher.user.full_name }}</td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'attendance:list' %}" class="btn btn-outline-primary btn-sm">
+                            View All Attendance <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent attendance records found.</p>
+                        {% if user.user_type == 'teacher' %}
+                        <a href="{% url 'attendance:mark' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Mark Attendance
+                        </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if user.user_type == 'admin' %}
+                        <!-- MISSING URL: students:add -->
+                        <a href="{% url 'students:add' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-user-plus me-2"></i>Add New Student
+                        </a>
+                        <!-- MISSING URL: teachers:add -->
+                        <a href="{% url 'teachers:add' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-user-tie me-2"></i>Add New Teacher
+                        </a>
+                        <!-- MISSING URL: classes:add -->
+                        <a href="{% url 'classes:add' %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-plus-circle me-2"></i>Create New Class
+                        </a>
+                        <!-- MISSING URL: subjects:add -->
+                        <a href="{% url 'subjects:add' %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-book-medical me-2"></i>Add New Subject
+                        </a>
+                    {% endif %}
+                    
+                    {% if user.user_type == 'teacher' %}
+                        <a href="{% url 'attendance:mark' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-calendar-check me-2"></i>Mark Attendance
+                        </a>
+                        <a href="{% url 'grades:add' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-plus-square me-2"></i>Add Grades
+                        </a>
+                        <!-- INCORRECT URL: grades:exams (should be grades:exam_list) -->
+                        <a href="{% url 'grades:exams' %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-file-alt me-2"></i>Create Exam
+                        </a>
+                    {% endif %}
+                    
+                    {% if user.user_type == 'student' %}
+                        <a href="{% url 'grades:my_grades' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-chart-bar me-2"></i>View My Grades
+                        </a>
+                        <a href="{% url 'attendance:my_attendance' %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-calendar-alt me-2"></i>View My Attendance
+                        </a>
+                    {% endif %}
+                    
+                    <hr>
+                    <!-- MISSING URL: accounts:profile -->
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-user-edit me-2"></i>Update Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Widget -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-calendar me-2"></i>Today's Date
+                </h6>
+            </div>
+            <div class="card-body text-center">
+                <h3 class="text-primary mb-0">{{ today|date:"d" }}</h3>
+                <p class="mb-0">{{ today|date:"F Y" }}</p>
+                <small class="text-muted">{{ today|date:"l" }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+    });
+    
+    // Auto-hide messages after 5 seconds
+    const alerts = document.querySelectorAll('.alert-dismissible');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

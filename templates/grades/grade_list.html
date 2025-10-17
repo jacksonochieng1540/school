@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Grades{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Grades</h2>
+
+  <!-- Filter & Search -->
+  <form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+      <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Search student or exam">
+    </div>
+    <div class="col-md-2">
+      <select name="subject" class="form-select">
+        <option value="">All Subjects</option>
+        {% for subject in subjects %}
+          <option value="{{ subject.id }}" {% if subject_filter == subject.id|stringformat:"s" %}selected{% endif %}>
+            {{ subject.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="exam_type" class="form-select">
+        <option value="">All Exam Types</option>
+        {% for exam_type in exam_types %}
+          <option value="{{ exam_type.id }}" {% if exam_type_filter == exam_type.id|stringformat:"s" %}selected{% endif %}>
+            {{ exam_type.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="class" class="form-select">
+        <option value="">All Classes</option>
+        {% for c in classes %}
+          <option value="{{ c.id }}" {% if class_filter == c.id|stringformat:"s" %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  <!-- Grades Table -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Student</th>
+          <th>Exam</th>
+          <th>Subject</th>
+          <th>Marks</th>
+          <th>Percentage</th>
+          <th>Grade</th>
+          <th>Graded By</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for grade in grades %}
+        <tr>
+          <td>{{ grade.student.user.get_full_name }}</td>
+          <td>{{ grade.exam.name }}</td>
+          <td>{{ grade.exam.subject.name }}</td>
+          <td>{{ grade.marks_obtained }}</td>
+          <td>{{ grade.percentage }}%</td>
+          <td>{{ grade.letter_grade }}</td>
+          <td>{{ grade.graded_by.user.get_full_name }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">No grades found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if grades.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ grades.previous_page_number }}">&laquo;</a></li>
+      {% endif %}
+      {% for num in grades.paginator.page_range %}
+      <li class="page-item {% if grades.number == num %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+      {% endfor %}
+      {% if grades.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ grades.next_page_number }}">&raquo;</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}

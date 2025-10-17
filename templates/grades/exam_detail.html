@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Exam Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ exam.name }}</h2>
+  <p><strong>Subject:</strong> {{ exam.subject.name }}</p>
+  <p><strong>Exam Type:</strong> {{ exam.exam_type.name }}</p>
+  <p><strong>Class:</strong> {{ exam.class_assigned.name }}</p>
+  <p><strong>Max Marks:</strong> {{ exam.max_marks }}</p>
+  <p><strong>Date:</strong> {{ exam.date|date:"M d, Y" }}</p>
+
+  <a href="{% url 'grades:enter_grades' exam.id %}" class="btn btn-primary mt-3">Enter Grades</a>
+</div>
+{% endblock %}

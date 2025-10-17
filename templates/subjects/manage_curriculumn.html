@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Manage Curriculum{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Curriculum for {{ subject.name }}</h2>
+
+    <a href="{% url 'subjects:add_curriculum' subject.pk %}" class="btn btn-primary mb-3">Add Curriculum</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Grade</th>
+                <th>Academic Year</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in curriculums %}
+            <tr>
+                <td>{{ c.grade.name }}</td>
+                <td>{{ c.academic_year.year }}</td>
+                <td>{{ c.description }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center text-muted">No curriculum found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

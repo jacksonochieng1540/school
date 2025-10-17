@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Bulk Import Students{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Bulk Import Students</h2>
+    <p>Upload a CSV file to bulk import students (feature coming soon).</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="csv_file" accept=".csv" class="form-control mb-3">
+        <button class="btn btn-primary">Upload</button>
+        <a href="{% url 'students:list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

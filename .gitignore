@@ -1,0 +1,25 @@
+# Django
+db.sqlite3
+media/
+staticfiles/
+.env
+.env.*
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+Scripts/
+bin/
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Migrations 
+ */migrations/
+
+# Byte-compiled / cache
+*.pyc
+__pycache__/

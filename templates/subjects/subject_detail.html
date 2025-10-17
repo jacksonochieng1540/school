@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Subject Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ subject.name }} ({{ subject.code }})</h2>
+    <p><strong>Type:</strong> {% if subject.is_core %}Core{% else %}Elective{% endif %}</p>
+    <p><strong>Description:</strong> {{ subject.description|default:"-" }}</p>
+
+    <h4 class="mt-4">Grades</h4>
+    {% for grade in subject.grades.all %}
+        <span class="badge bg-info">{{ grade.name }}</span>
+    {% empty %}
+        <p class="text-muted">No grades assigned.</p>
+    {% endfor %}
+
+    <h4 class="mt-4">Teacher Assignments</h4>
+    <ul>
+        {% for a in assignments %}
+            <li>{{ a.teacher.full_name }} → {{ a.class_room.name }} ({{ a.academic_year.year }})</li>
+        {% empty %}
+            <li class="text-muted">No teacher assignments.</li>
+        {% endfor %}
+    </ul>
+
+    <h4 class="mt-4">Curriculum</h4>
+    <ul>
+        {% for c in curriculums %}
+            <li>{{ c.grade.name }} ({{ c.academic_year.year }}): {{ c.description|truncatechars:80 }}</li>
+        {% empty %}
+            <li class="text-muted">No curriculum defined.</li>
+        {% endfor %}
+    </ul>
+
+    {% if can_edit %}
+        <a href="{% url 'subjects:edit' subject.pk %}" class="btn btn-warning">Edit</a>
+        <a href="{% url 'subjects:assign_teacher' subject.pk %}" class="btn btn-secondary">Assign Teacher</a>
+        <a href="{% url 'subjects:manage_curriculum' subject.pk %}" class="btn btn-info">Manage Curriculum</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Enter Grades{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Enter Grades for {{ exam.name }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    <table class="table table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Student</th>
+          <th>Marks Obtained</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student.user.get_full_name }}</td>
+          <td>
+            <input type="number" name="marks_{{ student.id }}" class="form-control" required>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Save Grades</button>
+  </form>
+</div>
+{% endblock %}

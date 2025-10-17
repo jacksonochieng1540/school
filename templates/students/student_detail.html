@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Student Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ student.user.first_name }} {{ student.user.last_name }}</h2>
+    <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+    <p><strong>Email:</strong> {{ student.user.email }}</p>
+    <p><strong>Class:</strong> {{ student.class_room.name }} (Grade: {{ student.class_room.grade.name }})</p>
+    <p><strong>Admission Date:</strong> {{ student.admission_date }}</p>
+
+    <hr>
+
+    <h4>Recent Grades</h4>
+    <ul>
+      {% for g in recent_grades %}
+        <li>{{ g.exam.name }}: {{ g.percentage }}% ({{ g.letter_grade }})</li>
+      {% empty %}
+        <li class="text-muted">No grades recorded.</li>
+      {% endfor %}
+    </ul>
+
+    <p><strong>Average Grade:</strong> {{ avg_grade }}%</p>
+
+    <h4>Attendance</h4>
+    <p><strong>Total Sessions:</strong> {{ total_attendance }}</p>
+    <p><strong>Present:</strong> {{ present_count }}</p>
+    <p><strong>Attendance Rate:</strong> {{ attendance_percentage }}%</p>
+
+    <h4>Documents</h4>
+    <ul>
+      {% for doc in documents %}
+        <li>
+          <a href="{{ doc.file.url }}" target="_blank">{{ doc.title }}</a>
+        </li>
+      {% empty %}
+        <li class="text-muted">No documents uploaded.</li>
+      {% endfor %}
+    </ul>
+
+    {% if can_edit %}
+      <a href="{% url 'students:edit' student.pk %}" class="btn btn-warning">Edit Student</a>
+      <a href="{% url 'students:upload_document' student.pk %}" class="btn btn-primary">Upload Document</a>
+    {% endif %}
+</div>
+{% endblock %}

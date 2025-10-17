@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Assign Teacher{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Assign Teacher to {{ subject.name }}</h2>
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Assign</button>
+        <a href="{% url 'subjects:detail' subject.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

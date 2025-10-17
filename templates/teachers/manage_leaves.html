@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Manage Leave Requests{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Leave Requests</h2>
+
+    <form method="get" class="mb-3">
+        <select name="status" class="form-select w-auto d-inline">
+            <option value="">All</option>
+            {% for s in status_choices %}
+                <option value="{{ s.0 }}" {% if status_filter == s.0 %}selected{% endif %}>{{ s.1 }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-secondary">Filter</button>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Teacher</th>
+                <th>Period</th>
+                <th>Status</th>
+                <th>Applied On</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leave in leaves %}
+            <tr>
+                <td>{{ leave.teacher.full_name }}</td>
+                <td>{{ leave.start_date }} → {{ leave.end_date }}</td>
+                <td>{{ leave.get_status_display }}</td>
+                <td>{{ leave.applied_on }}</td>
+                <td>
+                    <a href="{% url 'teachers:approve_leave' leave.pk %}" class="btn btn-sm btn-outline-primary">Review</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">No leave requests found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            {% if leaves.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ leaves.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% for page_num in leaves.paginator.page_range %}
+                <li class="page-item {% if leaves.number == page_num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+            {% endfor %}
+            {% if leaves.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ leaves.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Attendance Records{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Attendance</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Attendance Records</h5>
+    <div>
+      <a href="{% url 'attendance:mark' %}" class="btn btn-sm btn-primary me-2">
+        <i class="fas fa-plus-circle me-1"></i>Start Session
+      </a>
+      <a href="{% url 'attendance:reports' %}" class="btn btn-sm btn-secondary">
+        <i class="fas fa-file-alt me-1"></i>Reports
+      </a>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form method="get" class="row g-2 mb-3">
+      {{ form.non_field_errors }}
+      <div class="col-md-2">
+        <label class="form-label">From</label>
+        {{ form.date_from }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">To</label>
+        {{ form.date_to }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Class</label>
+        {{ form.class_room }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Subject</label>
+        {{ form.subject }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Status</label>
+        {{ form.status }}
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-outline-primary w-100" type="submit"><i class="fas fa-filter me-1"></i>Filter</button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Student</th>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Time In</th>
+            <th>Marked By</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in records %}
+            <tr>
+              <td>{{ rec.date|date:"Y-m-d" }}</td>
+              <td>{{ rec.student.user.get_full_name|default:rec.student.user.username }}</td>
+              <td>{{ rec.class_room }}</td>
+              <td>
+                {% if rec.subject %}
+                  {{ rec.subject.name }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if rec.status == 'present' %}
+                  <span class="badge bg-success">Present</span>
+                {% elif rec.status == 'late' %}
+                  <span class="badge bg-warning text-dark">Late</span>
+                {% elif rec.status == 'absent' %}
+                  <span class="badge bg-danger">Absent</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ rec.status }}</span>
+                {% endif %}
+              </td>
+              <td>{{ rec.time_in|time:"H:i" }}</td>
+              <td>{{ rec.marked_by.user.get_full_name|default:rec.marked_by.user.username }}</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-info" href="{% url 'attendance:session_detail' rec.session.id %}"><i class="fas fa-eye"></i></a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">No records found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        <small class="text-muted">Showing {{ records.start_index }} - {{ records.end_index }} of {{ total_records }} records</small>
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          {% if records.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ records.previous_page_number }}{% if request.GET %}&{{ request.GET.urlencode }}{% endif %}">&laquo;</a></li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+          {% endif %}
+          {% for num in records.paginator.page_range %}
+            {% if records.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > records.number|add:'-3' and num < records.number|add:'3' %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if records.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ records.next_page_number }}">&raquo;</a></li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+{% endblock %}

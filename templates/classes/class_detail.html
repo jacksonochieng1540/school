@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Class Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ classroom.name }}</h2>
+  <p>
+    <strong>Grade:</strong> {{ classroom.grade.name }} <br>
+    <strong>Teacher:</strong> {{ classroom.class_teacher.user.get_full_name }} <br>
+    <strong>Academic Year:</strong> {{ classroom.academic_year.name }} <br>
+    <strong>Room Number:</strong> {{ classroom.room_number }}
+  </p>
+
+  <h4 class="mt-3">Students</h4>
+  <ul class="list-group mb-4">
+    {% for student in students %}
+    <li class="list-group-item">{{ student.user.get_full_name }}</li>
+    {% empty %}
+    <li class="list-group-item text-muted">No students enrolled.</li>
+    {% endfor %}
+  </ul>
+
+  <h4>Subjects</h4>
+  <ul class="list-group">
+    {% for subject in subjects %}
+    <li class="list-group-item">{{ subject.name }}</li>
+    {% empty %}
+    <li class="list-group-item text-muted">No subjects assigned.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

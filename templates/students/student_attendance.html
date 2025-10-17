@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Student Attendance{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Attendance for {{ student.user.first_name }} {{ student.user.last_name }}</h2>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in attendance_records %}
+          <tr>
+            <td>{{ rec.date|date:"Y-m-d" }}</td>
+            <td>{{ rec.subject.name if rec.subject else "-" }}</td>
+            <td>{{ rec.status|title }}</td>
+            <td>{{ rec.teacher.user.get_full_name }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted">No attendance records.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination">
+        {% if attendance_records.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ attendance_records.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        {% for num in attendance_records.paginator.page_range %}
+          <li class="page-item {% if attendance_records.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+        {% endfor %}
+        {% if attendance_records.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ attendance_records.next_page_number }}">Next</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <h4 class="mt-4">Monthly Summary (Year-to-date)</h4>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Month</th><th>Total</th><th>Present</th><th>Absent</th><th>Late</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in monthly_summary %}
+        <tr>
+          <td>{{ m.date__month }}</td>
+          <td>{{ m.total }}</td>
+          <td>{{ m.present }}</td>
+          <td>{{ m.absent }}</td>
+          <td>{{ m.late }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted">No data</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+{% endblock %}

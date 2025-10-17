@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Teacher Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ teacher.user.first_name }} {{ teacher.user.last_name }}</h2>
+    <p><strong>Email:</strong> {{ teacher.user.email }}</p>
+    <p><strong>Employee ID:</strong> {{ teacher.employee_id }}</p>
+    <p><strong>Specialization:</strong> {{ teacher.specialization }}</p>
+    <p><strong>Qualification:</strong> {{ teacher.get_qualification_display }}</p>
+    <p><strong>Employment Status:</strong> {{ teacher.get_employment_status_display }}</p>
+
+    <h4 class="mt-4">Subjects</h4>
+    {% for subject in teacher.subjects.all %}
+        <span class="badge bg-info">{{ subject.name }}</span>
+    {% empty %}
+        <p class="text-muted">No subjects assigned.</p>
+    {% endfor %}
+
+    <h4 class="mt-4">Assigned Classes</h4>
+    <ul>
+        {% for class in assigned_classes %}
+            <li>{{ class.grade.name }} ({{ class.academic_year.year }})</li>
+        {% empty %}
+            <li class="text-muted">No classes assigned.</li>
+        {% endfor %}
+    </ul>
+
+    <h4 class="mt-4">Weekly Schedule</h4>
+    {% for day, schedules in schedule_by_day.items %}
+        <h5>{{ day }}</h5>
+        <ul>
+            {% for s in schedules %}
+                <li>{{ s.start_time }} - {{ s.end_time }}: {{ s.subject.name }} ({{ s.class_room.name }})</li>
+            {% empty %}
+                <li class="text-muted">No schedule.</li>
+            {% endfor %}
+        </ul>
+    {% empty %}
+        <p class="text-muted">No schedule available.</p>
+    {% endfor %}
+
+    <h4 class="mt-4">Recent Leave Requests</h4>
+    <ul>
+        {% for leave in recent_leaves %}
+            <li>{{ leave.start_date }} → {{ leave.end_date }} ({{ leave.get_status_display }})</li>
+        {% empty %}
+            <li class="text-muted">No leave requests.</li>
+        {% endfor %}
+    </ul>
+
+    {% if can_edit %}
+        <a href="{% url 'teachers:edit' teacher.pk %}" class="btn btn-warning">Edit</a>
+        <a href="{% url 'teachers:schedule' teacher.pk %}" class="btn btn-secondary">Schedule</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Start Attendance Session{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'attendance:list' %}">Attendance</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Start Session</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h5 class="mb-0">New Attendance Session</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="mb-3">
+            <label class="form-label">Class</label>
+            {{ form.class_room }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Subject (optional)</label>
+            {{ form.subject }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date</label>
+            {{ form.date }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            {{ form.notes }}
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-play me-1"></i> Start Session</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h6 class="mb-0">Recent Sessions</h6>
+      </div>
+      <div class="card-body">
+        {% if recent_sessions %}
+          <ul class="list-group">
+            {% for s in recent_sessions %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ s.class_room.name }}</strong><br>
+                  <small class="text-muted">{{ s.date|date:"Y-m-d" }} • {{ s.subject.name|default:"No subject" }}</small>
+                </div>
+                <div>
+                  <a href="{% url 'attendance:bulk_mark' s.pk %}" class="btn btn-sm btn-outline-primary me-1">Mark</a>
+                  <a href="{% url 'attendance:session_detail' s.pk %}" class="btn btn-sm btn-outline-secondary">View</a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No recent sessions.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

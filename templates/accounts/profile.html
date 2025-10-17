@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="mb-4">My Profile</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>First Name:</strong> {{ user.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+
+            {% if user.profile_picture %}
+                <p><strong>Profile Picture:</strong></p>
+                <img src="{{ user.profile_picture.url }}" class="img-thumbnail" style="max-width: 150px;">
+            {% endif %}
+
+            <a href="{% url 'accounts:profile_update' %}" class="btn btn-warning mt-3">Update Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

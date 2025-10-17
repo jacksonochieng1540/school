@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Upload Document{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Upload Document for {{ student.user.first_name }} {{ student.user.last_name }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary">Upload</button>
+        <a href="{% url 'students:detail' student.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

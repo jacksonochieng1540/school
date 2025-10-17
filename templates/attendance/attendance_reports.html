@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance Reports{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Attendance Reports</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="get" class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label for="class_room" class="form-label">Class</label>
+                            <select name="class_room" id="class_room" class="form-select">
+                                <option value="">All Classes</option>
+                                {% for room in class_rooms %}
+                                    <option value="{{ room.id }}" {% if selected_class and selected_class.id == room.id %}selected{% endif %}>
+                                        {{ room.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="month" class="form-label">Month</label>
+                            <input type="month" name="month" id="month" class="form-control" value="{{ selected_month }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="year" class="form-label">Year</label>
+                            <select name="year" id="year" class="form-select">
+                                {% for year in years %}
+                                    <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">Generate Report</button>
+                        </div>
+                    </form>
+
+                    {% if reports %}
+                    <!-- Summary Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h4>{{ total_students }}</h4>
+                                    <p>Total Students</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h4>{{ average_attendance }}%</h4>
+                                    <p>Average Attendance</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <h4>{{ total_present }}</h4>
+                                    <p>Total Present</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h4>{{ total_absent }}</h4>
+                                    <p>Total Absent</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Report Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Student ID</th>
+                                    <th>Present Days</th>
+                                    <th>Absent Days</th>
+                                    <th>Late Days</th>
+                                    <th>Total Days</th>
+                                    <th>Attendance %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in reports %}
+                                <tr>
+                                    <td>{{ report.student.user.get_full_name }}</td>
+                                    <td>{{ report.student.student_id }}</td>
+                                    <td>{{ report.present_days }}</td>
+                                    <td>{{ report.absent_days }}</td>
+                                    <td>{{ report.late_days }}</td>
+                                    <td>{{ report.total_days }}</td>
+                                    <td>
+                                        <span class="badge {% if report.attendance_percentage >= 75 %}bg-success{% elif report.attendance_percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ report.attendance_percentage }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="mt-3">
+                        <a href="?{{ request.GET.urlencode }}&export=csv" class="btn btn-success">
+                            <i class="fas fa-download"></i> Export as CSV
+                        </a>
+                        <a href="?{{ request.GET.urlencode }}&export=pdf" class="btn btn-danger">
+                            <i class="fas fa-file-pdf"></i> Export as PDF
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info text-center">
+                        <h4>No attendance data found</h4>
+                        <p>Please select filters to generate attendance reports.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

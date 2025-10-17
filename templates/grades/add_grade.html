@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Grade - School Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Grade
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.student.id_for_label }}" class="form-label">Student</label>
+                                    {{ form.student }}
+                                    {% if form.student.errors %}
+                                        <div class="text-danger">{{ form.student.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.exam.id_for_label }}" class="form-label">Exam</label>
+                                    {{ form.exam }}
+                                    {% if form.exam.errors %}
+                                        <div class="text-danger">{{ form.exam.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.marks_obtained.id_for_label }}" class="form-label">Marks Obtained</label>
+                                    {{ form.marks_obtained }}
+                                    {% if form.marks_obtained.errors %}
+                                        <div class="text-danger">{{ form.marks_obtained.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
+                            {{ form.remarks }}
+                            {% if form.remarks.errors %}
+                                <div class="text-danger">{{ form.remarks.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Grade
+                            </button>
+                            <a href="{% url 'grades:list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

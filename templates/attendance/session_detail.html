@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Session: {{ session.class_room.name }} - {{ session.date|date:"Y-m-d" }}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'attendance:list' %}">Attendance</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Session</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5>{{ session.class_room.name }} • {{ session.date|date:"Y-m-d" }}</h5>
+        <p class="text-muted mb-0">
+          Subject: {{ session.subject.name if session.subject else "—" }} |
+          Teacher: {{ session.teacher.user.get_full_name|default:session.teacher.user.username }} |
+          Students: {{ session.total_students }}
+        </p>
+
+        <hr>
+
+        <div class="table-responsive">
+          <table class="table table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Status</th>
+                <th>Time In</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in records %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ r.student.user.get_full_name|default:r.student.user.username }}</td>
+                  <td>
+                    {% if r.status == 'present' %}
+                      <span class="badge bg-success">Present</span>
+                    {% elif r.status == 'late' %}
+                      <span class="badge bg-warning text-dark">Late</span>
+                    {% elif r.status == 'absent' %}
+                      <span class="badge bg-danger">Absent</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ r.status }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ r.time_in|time:"H:i" }}</td>
+                  <td>{{ r.remarks }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">No attendance recorded for this session.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <h6>Session Statistics</h6>
+        <div class="mb-2">
+          <strong>Total Students:</strong> {{ stats.total_students }}
+        </div>
+        <div class="mb-2">
+          <strong>Present:</strong> {{ stats.present_count }}
+        </div>
+        <div class="mb-2">
+          <strong>Absent:</strong> {{ stats.absent_count }}
+        </div>
+        <div class="mb-2">
+          <strong>Attendance Rate:</strong> {{ stats.attendance_rate }}%
+        </div>
+
+        <hr>
+        <div class="d-grid gap-2">
+          {% if can_edit %}
+            <a href="{% url 'attendance:bulk_mark' session.pk %}" class="btn btn-primary">Edit Attendance</a>
+          {% endif %}
+          <a href="{% url 'attendance:list' %}" class="btn btn-outline-secondary">Back to Records</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h6 class="mb-0">Session Info</h6>
+      </div>
+      <div class="card-body">
+        <p><strong>Created:</strong> {{ session.created_at|date:"Y-m-d H:i" }}</p>
+        <p><strong>Completed:</strong> {% if session.completed_at %}{{ session.completed_at|date:"Y-m-d H:i" }}{% else %}No{% endif %}</p>
+        <p><strong>Notes:</strong> {{ session.notes|default:"—" }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

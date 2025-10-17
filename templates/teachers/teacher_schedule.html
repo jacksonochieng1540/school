@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Teacher Schedule{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Schedule for {{ teacher.full_name }}</h2>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Schedule</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for day, schedules in schedule_grid.items %}
+            <tr>
+                <td class="fw-bold text-capitalize">{{ day }}</td>
+                <td>
+                    {% for s in schedules %}
+                        <div>{{ s.start_time }} - {{ s.end_time }}: {{ s.subject.name }} ({{ s.class_room.name }})</div>
+                    {% empty %}
+                        <span class="text-muted">No classes</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if can_edit %}
+        <a href="{% url 'teachers:add_schedule' teacher.pk %}" class="btn btn-primary">Add Schedule</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Student Grades{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Grades for {{ student.user.first_name }} {{ student.user.last_name }}</h2>
+
+    {% for subject, grades in grades_by_subject.items %}
+      <h4>{{ subject }}</h4>
+      <table class="table table-sm table-striped mb-3">
+        <thead>
+          <tr>
+            <th>Exam</th>
+            <th>Percentage</th>
+            <th>Grade</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for g in grades %}
+          <tr>
+            <td>{{ g.exam.name }}</td>
+            <td>{{ g.percentage }}%</td>
+            <td>{{ g.letter_grade }}</td>
+            <td>{{ g.remarks }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+
+    <p><strong>Overall Average:</strong> {{ overall_average }}%</p>
+</div>
+{% endblock %}

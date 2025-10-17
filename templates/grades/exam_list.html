@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Exams{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">Exams</h2>
+  <a href="{% url 'grades:create_exam' %}" class="btn btn-success mb-3">+ Create Exam</a>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Name</th>
+          <th>Subject</th>
+          <th>Exam Type</th>
+          <th>Class</th>
+          <th>Max Marks</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exam in exams %}
+        <tr>
+          <td><a href="{% url 'grades:exam_detail' exam.id %}">{{ exam.name }}</a></td>
+          <td>{{ exam.subject.name }}</td>
+          <td>{{ exam.exam_type.name }}</td>
+          <td>{{ exam.class_assigned.name }}</td>
+          <td>{{ exam.max_marks }}</td>
+          <td>{{ exam.date|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted">No exams found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

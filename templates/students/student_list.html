@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Students{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Students ({{ total_students }})</h2>
+
+    <!-- Filters / Search -->
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="search" class="form-control" placeholder="Search name, ID, email..." value="{{ search_query }}">
+        </div>
+        <div class="col-md-2">
+            <select name="class" class="form-select">
+                <option value="">All Classes</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {% if class_filter == c.id|stringformat:"s" %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="grade" class="form-select">
+                <option value="">All Grades</option>
+                {% for g in grades %}
+                    <option value="{{ g.id }}" {% if grade_filter == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="gender" class="form-select">
+                <option value="">Gender</option>
+                <option value="M" {% if gender_filter == 'M' %}selected{% endif %}>Male</option>
+                <option value="F" {% if gender_filter == 'F' %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <!-- Students table -->
+    <div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Class</th>
+                <th>Grade Level</th>
+                <th>Gender</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.user.first_name }} {{ student.user.last_name }}</td>
+                <td>{{ student.student_id }}</td>
+                <td>{{ student.class_room.name }}</td>
+                <td>{{ student.class_room.grade.name }}</td>
+                <td>{{ student.get_gender_display }}</td>
+                <td>
+                    <a href="{% url 'students:detail' student.pk %}" class="btn btn-sm btn-outline-info">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination justify-content-center">
+        {% if students.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ students.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        {% for num in students.paginator.page_range %}
+          <li class="page-item {% if students.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+        {% endfor %}
+        {% if students.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ students.next_page_number }}">Next</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+</div>
+{% endblock %}

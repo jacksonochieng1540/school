@@ -8,7 +8,6 @@ from classes.models import ClassRoom, AcademicYear
 User = get_user_model()
 
 class StudentForm(forms.ModelForm):
-    # User fields
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     email = forms.EmailField()
@@ -33,7 +32,7 @@ class StudentForm(forms.ModelForm):
         self.instance_user = kwargs.pop('instance_user', None)
         super().__init__(*args, **kwargs)
         
-        # If editing existing student, populate user fields
+    
         if self.instance and self.instance.pk:
             user = self.instance.user
             self.fields['first_name'].initial = user.first_name
@@ -44,12 +43,12 @@ class StudentForm(forms.ModelForm):
             self.fields['address'].initial = user.address
             self.fields['date_of_birth'].initial = user.date_of_birth
         
-        # Filter class rooms by active academic year
+        
         self.fields['class_room'].queryset = ClassRoom.objects.filter(
             academic_year__is_active=True
         ).select_related('grade')
         
-        # Set default academic year
+        
         try:
             active_year = AcademicYear.objects.get(is_active=True)
             self.fields['academic_year'].initial = active_year
@@ -112,11 +111,11 @@ class StudentForm(forms.ModelForm):
     def clean_username(self):
         username = self.cleaned_data['username']
         if self.instance and self.instance.pk:
-            # Editing existing student
+        
             if User.objects.exclude(pk=self.instance.user.pk).filter(username=username).exists():
                 raise forms.ValidationError("A user with this username already exists.")
         else:
-            # Creating new student
+            
             if User.objects.filter(username=username).exists():
                 raise forms.ValidationError("A user with this username already exists.")
         return username
@@ -124,11 +123,11 @@ class StudentForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data['email']
         if self.instance and self.instance.pk:
-            # Editing existing student
+        
             if User.objects.exclude(pk=self.instance.user.pk).filter(email=email).exists():
                 raise forms.ValidationError("A user with this email already exists.")
         else:
-            # Creating new student
+            
             if User.objects.filter(email=email).exists():
                 raise forms.ValidationError("A user with this email already exists.")
         return email
@@ -136,7 +135,7 @@ class StudentForm(forms.ModelForm):
     def clean_class_room(self):
         class_room = self.cleaned_data.get('class_room')
         if class_room and class_room.is_full:
-            # Allow if editing existing student who's already in this class
+            
             if not (self.instance and self.instance.pk and self.instance.class_room == class_room):
                 raise forms.ValidationError("This class is full. Cannot assign more students.")
         return class_room
@@ -145,7 +144,7 @@ class StudentForm(forms.ModelForm):
         student = super().save(commit=False)
         
         if self.instance and self.instance.pk:
-            # Editing existing student
+            
             user = self.instance.user
             user.first_name = self.cleaned_data['first_name']
             user.last_name = self.cleaned_data['last_name']
@@ -157,7 +156,7 @@ class StudentForm(forms.ModelForm):
             if commit:
                 user.save()
         else:
-            # Creating new student
+            
             user = User.objects.create_user(
                 username=self.cleaned_data['username'],
                 email=self.cleaned_data['email'],
@@ -167,7 +166,7 @@ class StudentForm(forms.ModelForm):
                 phone_number=self.cleaned_data['phone_number'],
                 address=self.cleaned_data['address'],
                 date_of_birth=self.cleaned_data['date_of_birth'],
-                password='student123'  # Default password
+                password='student123'  
             )
             student.user = user
         

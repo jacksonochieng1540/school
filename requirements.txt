@@ -8,4 +8,3 @@ pillow==12.0.0
 python-decouple==3.8
 python-dotenv==1.1.1
 sqlparse==0.5.3
-tzdata==2025.2

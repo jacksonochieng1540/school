@@ -17,18 +17,18 @@ def grade_list(request):
     """List all grades with filtering options"""
     grades = Grade.objects.select_related('student__user', 'exam__subject', 'exam__class_room', 'graded_by__user')
     
-    # Filter by user type
+    
     if request.user.user_type == 'teacher':
         grades = grades.filter(graded_by__user=request.user)
     elif request.user.user_type == 'student':
-        # Safe check for student relationship
+     
         if hasattr(request.user, 'student'):
             grades = grades.filter(student__user=request.user)
         else:
             messages.error(request, "Student profile not found. Please contact administrator.")
             grades = Grade.objects.none()
     
-    # Search functionality
+    
     search_query = request.GET.get('search')
     if search_query:
         grades = grades.filter(
@@ -38,7 +38,7 @@ def grade_list(request):
             Q(exam__name__icontains=search_query)
         )
     
-    # Filters
+   
     subject_filter = request.GET.get('subject')
     if subject_filter:
         grades = grades.filter(exam__subject_id=subject_filter)
@@ -51,7 +51,7 @@ def grade_list(request):
     if class_filter:
         grades = grades.filter(exam__class_room_id=class_filter)
     
-    # Pagination
+   
     paginator = Paginator(grades, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -73,13 +73,13 @@ def exam_list(request):
     """List all exams"""
     exams = Exam.objects.select_related('exam_type', 'subject', 'class_room', 'teacher__user', 'academic_year')
     
-    # Filter by user type
+  
     if request.user.user_type == 'teacher':
         exams = exams.filter(teacher__user=request.user)
     elif request.user.user_type == 'student':
         exams = exams.filter(class_room=request.user.student.class_room)
     
-    # Search and filters
+    
     search_query = request.GET.get('search')
     if search_query:
         exams = exams.filter(
@@ -90,8 +90,7 @@ def exam_list(request):
     subject_filter = request.GET.get('subject')
     if subject_filter:
         exams = exams.filter(subject_id=subject_filter)
-    
-    # Status filter
+
     status_filter = request.GET.get('status')
     today = timezone.now().date()
     if status_filter == 'upcoming':
@@ -103,7 +102,7 @@ def exam_list(request):
     
     exams = exams.order_by('-date', '-start_time')
     
-    # Pagination
+   
     paginator = Paginator(exams, 15)
     page_number = request.GET.get('page')
     exams = paginator.get_page(page_number)
@@ -123,7 +122,7 @@ def create_exam(request):
     """Create a new exam"""
     teacher = None
     if request.user.user_type == 'teacher':
-        # Safe check for teacher relationship
+        
         if hasattr(request.user, 'teacher'):
             teacher = request.user.teacher
         else:
@@ -149,10 +148,9 @@ def exam_detail(request, pk):
     """Exam detail view"""
     exam = get_object_or_404(Exam.objects.select_related('exam_type', 'subject', 'class_room', 'teacher__user'), pk=pk)
     
-    # Get grades for this exam
     grades = Grade.objects.filter(exam=exam).select_related('student__user', 'graded_by__user').order_by('student__user__first_name')
     
-    # Calculate statistics
+    
     stats = {
         'total_students': exam.students_count,
         'grades_entered': grades.count(),
@@ -161,7 +159,7 @@ def exam_detail(request, pk):
         'lowest_score': grades.aggregate(lowest=models.Min('marks_obtained'))['lowest'] or 0,
     }
     
-    # Grade distribution
+  
     grade_distribution = {}
     for grade in grades:
         letter_grade = grade.letter_grade
@@ -181,18 +179,16 @@ def enter_grades(request, exam_pk):
     """Enter grades for an exam"""
     exam = get_object_or_404(Exam, pk=exam_pk)
     
-    # Check permission
     if request.user.user_type == 'teacher' and exam.teacher.user != request.user:
         messages.error(request, "You can only enter grades for your own exams.")
         return redirect('grades:exam_list')
     
-    # Get students in the class
+    
     students = Student.objects.filter(
         class_room=exam.class_room, 
         is_active=True
     ).select_related('user').order_by('user__first_name', 'user__last_name')
     
-    # Get existing grades
     existing_grades = {
         grade.student_id: grade 
         for grade in Grade.objects.filter(exam=exam)
@@ -247,7 +243,7 @@ def add_grade(request):
         if form.is_valid():
             grade = form.save(commit=False)
             
-            # Set the grader if it's a teacher
+            
             if request.user.user_type == 'teacher' and hasattr(request.user, 'teacher'):
                 grade.graded_by = request.user.teacher
             
@@ -257,7 +253,7 @@ def add_grade(request):
     else:
         form = GradeForm()
     
-    # Get recent students for quick selection
+    
     recent_students = Student.objects.filter(is_active=True).select_related('user')[:10]
     
     context = {
@@ -274,16 +270,16 @@ def my_grades(request):
         messages.error(request, "This page is only accessible to students.")
         return redirect('dashboard')
     
-    # Safe check for student relationship
+ 
     if not hasattr(request.user, 'student'):
         messages.error(request, "Student profile not found. Please contact administrator.")
         return redirect('dashboard')
     
-    # Now it's safe to access student
+   
     student = request.user.student
     grades = Grade.objects.filter(student=student).select_related('exam__subject', 'exam__exam_type').order_by('-graded_at')
     
-    # Group grades by subject
+    
     grades_by_subject = {}
     for grade in grades:
         if grade.exam and grade.exam.subject:
@@ -292,20 +288,20 @@ def my_grades(request):
                 grades_by_subject[subject] = []
             grades_by_subject[subject].append(grade)
     
-    # Calculate subject averages
+   
     subject_averages = {}
     for subject, subject_grades in grades_by_subject.items():
         if subject_grades:
-            # Safe calculation of percentage
+            
             valid_grades = [grade for grade in subject_grades if hasattr(grade, 'percentage') and grade.percentage is not None]
             if valid_grades:
                 avg = sum(grade.percentage for grade in valid_grades) / len(valid_grades)
                 subject_averages[subject] = round(avg, 2)
     
-    # Calculate overall average
+
     overall_average = sum(subject_averages.values()) / len(subject_averages) if subject_averages else 0
     
-    # Get recent grades
+
     recent_grades = grades[:10]
     
     context = {
@@ -330,7 +326,7 @@ def generate_report_card(request, student_pk):
             report_card.generated_by = request.user.teacher if request.user.user_type == 'teacher' else None
             report_card.save()
             
-            # Calculate grades
+      
             report_card.calculate_grades()
             report_card.calculate_rank()
             
@@ -346,18 +342,17 @@ def view_report_card(request, pk):
     """View a report card"""
     report_card = get_object_or_404(ReportCard.objects.select_related('student__user', 'academic_year'), pk=pk)
     
-    # Check permission
+
     if request.user.user_type == 'student' and request.user != report_card.student.user:
         messages.error(request, "You can only view your own report card.")
         return redirect('grades:my_grades')
     
-    # Get all grades for this report card
     grades = Grade.objects.filter(
         student=report_card.student,
         exam__academic_year=report_card.academic_year
     ).select_related('exam__subject', 'exam__exam_type').order_by('exam__subject__name')
     
-    # Group grades by subject
+   
     grades_by_subject = {}
     for grade in grades:
         subject = grade.exam.subject.name
@@ -395,7 +390,7 @@ def add_exam_type(request):
     
     return render(request, 'grades/add_exam_type.html', {'form': form})
 
-# AJAX Views
+
 @login_required
 def get_grade_comments(request):
     """AJAX view to get predefined grade comments"""
@@ -424,7 +419,7 @@ def grade_statistics(request):
             'pass_rate': grades.filter(percentage__gte=40).count() / grades.count() * 100 if grades.count() > 0 else 0,
         }
         
-        # Grade distribution
+      
         distribution = {}
         for grade in grades:
             letter = grade.letter_grade

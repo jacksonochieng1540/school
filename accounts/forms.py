@@ -36,7 +36,7 @@ class ProfileUpdateForm(forms.ModelForm):
                 ),
                 Row(
                     Column('email', css_class='form-group col-md-6'),
-                    Column('phone_number', css_class='form-group col-md-6'),
+                    Column('phone_number', css_class='form-group col-md-6'),  
                 ),
                 'date_of_birth',
                 'address',

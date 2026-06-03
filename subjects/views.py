@@ -13,7 +13,7 @@ from .forms import SubjectForm, SubjectTeacherAssignmentForm, CurriculumForm
 def subject_list(request):
     subjects = Subject.objects.prefetch_related('grades', 'teachers')
     
-    # Search functionality
+    
     search_query = request.GET.get('search')
     if search_query:
         subjects = subjects.filter(
@@ -22,25 +22,22 @@ def subject_list(request):
             Q(description__icontains=search_query)
         )
     
-    # Filter by type (core/elective)
     subject_type = request.GET.get('type')
     if subject_type == 'core':
         subjects = subjects.filter(is_core=True)
     elif subject_type == 'elective':
         subjects = subjects.filter(is_core=False)
     
-    # Filter by grade
     grade_filter = request.GET.get('grade')
     if grade_filter:
         subjects = subjects.filter(grades__id=grade_filter)
     
-    # Annotate with counts
     subjects = subjects.annotate(
         teacher_count=Count('teachers', distinct=True),
         grade_count=Count('grades', distinct=True)
     )
     
-    # Pagination
+    
     paginator = Paginator(subjects, 12)
     page_number = request.GET.get('page')
     subjects = paginator.get_page(page_number)
@@ -59,12 +56,10 @@ def subject_list(request):
 def subject_detail(request, pk):
     subject = get_object_or_404(Subject.objects.prefetch_related('grades', 'teachers'), pk=pk)
     
-    # Get teacher assignments
     assignments = SubjectTeacherAssignment.objects.filter(
         subject=subject, is_active=True
     ).select_related('teacher__user', 'class_room', 'academic_year')
     
-    # Get curriculum
     curriculums = Curriculum.objects.filter(subject=subject).select_related('grade', 'academic_year')
     
     context = {
@@ -114,7 +109,6 @@ def assign_teacher(request, subject_pk):
             return redirect('subjects:detail', pk=subject.pk)
     else:
         form = SubjectTeacherAssignmentForm(initial={'subject': subject})
-        # Filter classes that offer this subject
         form.fields['class_room'].queryset = form.fields['class_room'].queryset.filter(
             grade__in=subject.grades.all()
         )
@@ -144,12 +138,10 @@ def add_curriculum(request, subject_pk):
             return redirect('subjects:manage_curriculum', subject_pk=subject.pk)
     else:
         form = CurriculumForm(initial={'subject': subject})
-        # Filter grades that this subject is assigned to
         form.fields['grade'].queryset = subject.grades.all()
     
     return render(request, 'subjects/add_curriculum.html', {'form': form, 'subject': subject})
 
-# AJAX Views
 @login_required
 def get_subjects_by_grade(request):
     """AJAX view to get subjects by grade"""

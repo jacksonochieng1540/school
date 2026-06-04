@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from .forms import ProfileUpdateForm
 from django.utils import timezone
 
-class CustomLoginView(auth_views.LoginView):
+class CustomLoginView(auth_views.LoginView):   
     template_name = 'registration/login.html'
     redirect_authenticated_user = True
     

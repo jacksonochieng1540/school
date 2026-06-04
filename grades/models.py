@@ -8,7 +8,7 @@ from classes.models import Subject, AcademicYear, ClassRoom
 
 class ExamType(models.Model):
     """Different types of examinations"""
-    name = models.CharField(max_length=50)  # e.g., "Midterm", "Final", "Quiz", "Assignment"
+    name = models.CharField(max_length=50)  
     weight = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
@@ -34,17 +34,15 @@ class Exam(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
     
-    # Exam details
+
     date = models.DateField()
     start_time = models.TimeField()
     duration_minutes = models.IntegerField(validators=[MinValueValidator(15), MaxValueValidator(300)])
     total_marks = models.IntegerField(default=100, validators=[MinValueValidator(1)])
     
-    # Additional information
     instructions = models.TextField(blank=True)
     syllabus_covered = models.TextField(blank=True, help_text="Topics/chapters covered in this exam")
-    
-    # Status
+   
     is_published = models.BooleanField(default=False, help_text="Whether results are published to students")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -94,7 +92,6 @@ class Grade(models.Model):
     )
     remarks = models.TextField(blank=True)
     
-    # Administrative fields
     graded_by = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     graded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -157,7 +154,7 @@ class Grade(models.Model):
     
     @property
     def is_passing(self):
-        # Assuming 40% is the minimum passing percentage
+        
         return self.percentage >= 40
 
 class ReportCard(models.Model):
@@ -171,22 +168,22 @@ class ReportCard(models.Model):
         ('annual', 'Annual'),
     ])
     
-    # Calculated fields
+
     total_marks = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     marks_obtained = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     grade_point_average = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     overall_grade = models.CharField(max_length=2, blank=True)
     
-    # Rankings
+  
     class_rank = models.IntegerField(null=True, blank=True)
     total_students = models.IntegerField(null=True, blank=True)
     
-    # Administrative
+    
     generated_by = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, blank=True)
     generated_at = models.DateTimeField(auto_now_add=True)
     
-    # Comments
+
     teacher_comments = models.TextField(blank=True)
     principal_comments = models.TextField(blank=True)
     
@@ -201,14 +198,14 @@ class ReportCard(models.Model):
         """Calculate and update report card grades"""
         from django.db.models import Sum, Avg
         
-        # Get all grades for this student in this academic year
+      
         grades = Grade.objects.filter(
             student=self.student,
             exam__academic_year=self.academic_year
         ).select_related('exam')
         
         if grades.exists():
-            # Calculate totals
+          
             total_marks = sum(grade.exam.total_marks for grade in grades)
             marks_obtained = sum(float(grade.marks_obtained) for grade in grades)
             
@@ -216,11 +213,10 @@ class ReportCard(models.Model):
             self.marks_obtained = marks_obtained
             self.percentage = (marks_obtained / total_marks * 100) if total_marks > 0 else 0
             
-            # Calculate GPA
+           
             gpa = grades.aggregate(avg_gpa=Avg('grade_point'))['avg_gpa']
             self.grade_point_average = gpa or 0
-            
-            # Determine overall grade
+           
             if self.percentage >= 90:
                 self.overall_grade = 'A+'
             elif self.percentage >= 80:
@@ -240,7 +236,7 @@ class ReportCard(models.Model):
     
     def calculate_rank(self):
         """Calculate class rank for this student"""
-        # Get all report cards for the same class and term
+      
         same_class_reports = ReportCard.objects.filter(
             student__class_room=self.student.class_room,
             academic_year=self.academic_year,
@@ -249,7 +245,7 @@ class ReportCard(models.Model):
         
         self.total_students = same_class_reports.count()
         
-        # Find rank
+      
         for idx, report in enumerate(same_class_reports, 1):
             if report.id == self.id:
                 self.class_rank = idx

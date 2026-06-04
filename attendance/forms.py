@@ -28,16 +28,16 @@ class BulkAttendanceForm(forms.Form):
         for student in students:
             existing_record = existing_attendance.get(student.id)
 
-            # Status field
+          
             status_field_name = f'status_{student.id}'
             self.fields[status_field_name] = forms.ChoiceField(
                 choices=AttendanceRecord.ATTENDANCE_CHOICES,
                 initial=existing_record.status if existing_record else 'present',
                 widget=forms.Select(attrs={'class': 'form-select form-select-sm'}),
-                label=student.__str__(),  # show student name
+                label=student.__str__(), 
             )
 
-            # Remarks field
+            
             remarks_field_name = f'remarks_{student.id}'
             self.fields[remarks_field_name] = forms.CharField(
                 required=False,
@@ -143,7 +143,7 @@ class AttendanceReportForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Default date range: last 30 days
+        
         today = timezone.now().date()
         thirty_days_ago = today - timezone.timedelta(days=30)
         self.fields['date_from'].initial = thirty_days_ago

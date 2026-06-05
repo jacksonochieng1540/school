@@ -224,7 +224,7 @@ def my_attendance(request):
 
     context = {
         'student': student,
-        'records': records[:10],  # recent records
+        'records': records[:10],  
         'summaries': summaries,
         'total_records': records.count(),
     }
@@ -260,7 +260,7 @@ def attendance_reports(request):
     return render(request, 'attendance/attendance_reports.html', {'form': form})
 
 
-# --- Helpers ---
+
 def update_attendance_summary(student, date):
     """Recalculate attendance summary for a student for the given month"""
     month, year = date.month, date.year

@@ -19,13 +19,13 @@ def attendance_list(request):
         'student__user', 'class_room', 'subject', 'teacher__user'
     )
 
-    # User-based filtering
+  
     if request.user.user_type == 'teacher':
         records = records.filter(teacher__user=request.user)
     elif request.user.user_type == 'student':
         records = records.filter(student__user=request.user)
 
-    # Apply search filters
+  
     form = AttendanceSearchForm(request.GET)
     if form.is_valid():
         if form.cleaned_data['date_from']:
@@ -63,7 +63,7 @@ def attendance_list(request):
 def mark_attendance(request):
     """Mark attendance for individual students"""
     
-    # Get initial filter parameters
+
     class_room_id = request.GET.get('class_room')
     subject_id = request.GET.get('subject')
     date = request.GET.get('date', timezone.now().date())
@@ -80,19 +80,19 @@ def mark_attendance(request):
         subject = get_object_or_404(Subject, id=subject_id)
     
     if request.method == 'POST':
-        # Remove the form validation since we're processing manually
+     
         saved_count = 0
         
         for student in students:
             status_key = f'status_{student.id}'
             remarks_key = f'remarks_{student.id}'
             
-            # Get data directly from request.POST instead of form.cleaned_data
+           
             status = request.POST.get(status_key)
             remarks = request.POST.get(remarks_key, '')
             
             if status:
-                # Get or create attendance record
+              
                 attendance, created = AttendanceRecord.objects.get_or_create(
                     student=student,
                     class_room=class_room,
@@ -106,7 +106,7 @@ def mark_attendance(request):
                 )
                 
                 if not created:
-                    # Update existing record
+                    
                     attendance.status = status
                     attendance.remarks = remarks
                     attendance.marked_by = request.user.teacher if hasattr(request.user, 'teacher') else None
@@ -117,7 +117,7 @@ def mark_attendance(request):
         messages.success(request, f'Attendance marked for {saved_count} students!')
         return redirect('attendance:list')
     
-    # Get existing attendance records for the selected date
+ 
     existing_attendance = {}
     if class_room and date:
         attendance_records = AttendanceRecord.objects.filter(
@@ -127,7 +127,6 @@ def mark_attendance(request):
         )
         existing_attendance = {record.student_id: record for record in attendance_records}
     
-    # Get available classes and subjects
     class_rooms = ClassRoom.objects.all()
     subjects = Subject.objects.all()
     
@@ -150,13 +149,12 @@ def bulk_mark_attendance(request, class_room_id, subject_id=None):
     class_room = get_object_or_404(ClassRoom, pk=class_room_id)
     subject = get_object_or_404(Subject, pk=subject_id) if subject_id else None
 
-    # Get students in this class
+    
     students = Student.objects.filter(
         class_room=class_room,
         is_active=True
     ).select_related('user').order_by('user__first_name', 'user__last_name')
 
-    # Get today's existing attendance
     existing_attendance = {}
     records = AttendanceRecord.objects.filter(
         class_room=class_room,
@@ -186,7 +184,7 @@ def bulk_mark_attendance(request, class_room_id, subject_id=None):
                     }
                 )
 
-                # Update summary
+         
                 update_attendance_summary(student, record.date)
                 saved_count += 1
 
@@ -211,7 +209,7 @@ def my_attendance(request):
         messages.error(request, "This page is only accessible to students.")
         return redirect('dashboard')
 
-    # Safe check for student relationship
+
     if not hasattr(request.user, 'student'):
         messages.error(request, "Student profile not found. Please contact administrator.")
         return redirect('dashboard')

@@ -36,7 +36,6 @@ def profile_update(request):
 
 @login_required
 def dashboard_view(request):
-    """Main dashboard view"""
     
     context = {
         'today': timezone.now().date(),

@@ -15,7 +15,7 @@ from grades.models import Grade as StudentGrade
 def student_list(request):
     students = Student.objects.select_related('user', 'class_room', 'academic_year').filter(is_active=True)
     
-    # Search functionality
+
     search_query = request.GET.get('search')
     if search_query:
         students = students.filter(
@@ -25,27 +25,27 @@ def student_list(request):
             Q(user__email__icontains=search_query)
         )
     
-    # Filter by class
+   
     class_filter = request.GET.get('class')
     if class_filter:
         students = students.filter(class_room_id=class_filter)
     
-    # Filter by grade
+
     grade_filter = request.GET.get('grade')
     if grade_filter:
         students = students.filter(class_room__grade_id=grade_filter)
     
-    # Filter by gender
+
     gender_filter = request.GET.get('gender')
     if gender_filter:
         students = students.filter(gender=gender_filter)
     
-    # Sorting
+
     sort_by = request.GET.get('sort', 'user__first_name')
     if sort_by in ['user__first_name', 'user__last_name', 'student_id', 'admission_date', 'class_room__name']:
         students = students.order_by(sort_by)
     
-    # Pagination
+
     paginator = Paginator(students, 20)
     page_number = request.GET.get('page')
     students = paginator.get_page(page_number)
@@ -70,18 +70,18 @@ def student_detail(request, pk):
         pk=pk
     )
     
-    # Get recent grades
+    
     recent_grades = StudentGrade.objects.filter(student=student).select_related('exam', 'exam__subject').order_by('-graded_at')[:10]
     
-    # Calculate average grade
+    
     avg_grade = StudentGrade.objects.filter(student=student).aggregate(avg=Avg('percentage'))['avg']
     
-    # Get attendance summary
+  
     from attendance.models import AttendanceRecord
     total_attendance = AttendanceRecord.objects.filter(student=student).count()
     present_count = AttendanceRecord.objects.filter(student=student, status='present').count()
     
-    # Get documents
+ 
     documents = student.documents.all()[:5]
     
     context = {
@@ -128,7 +128,7 @@ def student_grades(request, pk):
     student = get_object_or_404(Student, pk=pk)
     grades = StudentGrade.objects.filter(student=student).select_related('exam', 'exam__subject', 'graded_by').order_by('-graded_at')
     
-    # Group grades by subject
+    
     grades_by_subject = {}
     for grade in grades:
         subject = grade.exam.subject.name
@@ -136,7 +136,7 @@ def student_grades(request, pk):
             grades_by_subject[subject] = []
         grades_by_subject[subject].append(grade)
     
-    # Calculate subject averages
+
     subject_averages = {}
     for subject, subject_grades in grades_by_subject.items():
         avg = sum([g.percentage for g in subject_grades]) / len(subject_grades)
@@ -159,12 +159,12 @@ def student_attendance(request, pk):
     from attendance.models import AttendanceRecord
     attendance_records = AttendanceRecord.objects.filter(student=student).select_related('teacher', 'subject').order_by('-date')
     
-    # Pagination
+
     paginator = Paginator(attendance_records, 30)
     page_number = request.GET.get('page')
     attendance_records = paginator.get_page(page_number)
     
-    # Calculate monthly summary
+
     from django.db.models import Count
     from django.utils import timezone
     current_year = timezone.now().year
@@ -190,7 +190,7 @@ def student_attendance(request, pk):
 def upload_document(request, pk):
     student = get_object_or_404(Student, pk=pk)
     
-    # Check permissions
+  
     if request.user.user_type not in ['admin'] and request.user != student.user:
         raise Http404("You don't have permission to upload documents for this student.")
     
@@ -212,14 +212,11 @@ def upload_document(request, pk):
 def bulk_import(request):
     """Bulk import students from CSV file"""
     if request.method == 'POST':
-        # Handle CSV file upload and processing
-        # This is a placeholder for bulk import functionality
         messages.info(request, 'Bulk import functionality coming soon!')
         return redirect('students:list')
     
     return render(request, 'students/bulk_import.html')
 
-# AJAX Views for dynamic loading
 @login_required
 def get_students_by_class(request):
     """AJAX view to get students by class"""

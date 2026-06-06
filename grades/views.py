@@ -14,7 +14,6 @@ from teachers.models import Teacher
 
 @login_required
 def grade_list(request):
-    """List all grades with filtering options"""
     grades = Grade.objects.select_related('student__user', 'exam__subject', 'exam__class_room', 'graded_by__user')
     
     

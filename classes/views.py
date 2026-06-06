@@ -13,7 +13,7 @@ def class_list(request):
         student_count=Count('student')
     )
     
-    # Search functionality
+   
     search_query = request.GET.get('search')
     if search_query:
         classes = classes.filter(
@@ -22,17 +22,15 @@ def class_list(request):
             Q(room_number__icontains=search_query)
         )
     
-    # Filter by grade
     grade_filter = request.GET.get('grade')
     if grade_filter:
         classes = classes.filter(grade_id=grade_filter)
     
-    # Filter by academic year
+   
     academic_year_filter = request.GET.get('academic_year')
     if academic_year_filter:
         classes = classes.filter(academic_year_id=academic_year_filter)
     
-    # Pagination
     paginator = Paginator(classes, 12)
     page_number = request.GET.get('page')
     classes = paginator.get_page(page_number)
@@ -97,7 +95,7 @@ def subject_list(request):
             Q(code__icontains=search_query)
         )
     
-    # Filter by core/elective
+    
     subject_type = request.GET.get('type')
     if subject_type == 'core':
         subjects = subjects.filter(is_core=True)

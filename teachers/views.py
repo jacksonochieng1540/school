@@ -14,7 +14,7 @@ from classes.models import Subject
 def teacher_list(request):
     teachers = Teacher.objects.select_related('user').prefetch_related('subjects').filter(is_active=True)
     
-    # Search functionality
+
     search_query = request.GET.get('search')
     if search_query:
         teachers = teachers.filter(
@@ -25,27 +25,24 @@ def teacher_list(request):
             Q(specialization__icontains=search_query)
         )
     
-    # Filter by subject
+   
     subject_filter = request.GET.get('subject')
     if subject_filter:
         teachers = teachers.filter(subjects__id=subject_filter)
     
-    # Filter by qualification
+    
     qualification_filter = request.GET.get('qualification')
     if qualification_filter:
         teachers = teachers.filter(qualification=qualification_filter)
     
-    # Filter by employment status
     employment_filter = request.GET.get('employment_status')
     if employment_filter:
         teachers = teachers.filter(employment_status=employment_filter)
-    
-    # Sorting
+   
     sort_by = request.GET.get('sort', 'user__first_name')
     if sort_by in ['user__first_name', 'user__last_name', 'employee_id', 'joining_date', 'experience_years']:
         teachers = teachers.order_by(sort_by)
     
-    # Pagination
     paginator = Paginator(teachers, 20)
     page_number = request.GET.get('page')
     teachers = paginator.get_page(page_number)
@@ -71,16 +68,15 @@ def teacher_detail(request, pk):
         pk=pk
     )
     
-    # Get assigned classes
+   
     assigned_classes = teacher.assigned_classes.select_related('grade', 'academic_year')
     
-    # Get recent leave requests
+    
     recent_leaves = teacher.leave_requests.all()[:5]
     
-    # Get weekly schedule
     schedules = teacher.schedules.select_related('subject', 'class_room').order_by('day_of_week', 'start_time')
     
-    # Group schedules by day
+   
     schedule_by_day = {}
     for schedule in schedules:
         day = schedule.get_day_of_week_display()
@@ -127,15 +123,14 @@ def edit_teacher(request, pk):
 @login_required
 def teacher_schedule(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
-    
-    # Check permissions
+   
     if request.user.user_type not in ['admin'] and request.user != teacher.user:
         messages.error(request, "You don't have permission to view this schedule.")
         return redirect('teachers:list')
     
     schedules = teacher.schedules.select_related('subject', 'class_room').order_by('day_of_week', 'start_time')
     
-    # Create weekly schedule grid
+    
     days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
     schedule_grid = {}
     
@@ -170,12 +165,11 @@ def add_schedule(request, teacher_pk):
 def request_leave(request, pk=None):
     if pk:
         teacher = get_object_or_404(Teacher, pk=pk)
-        # Admin can request leave for any teacher
+   
         if request.user.user_type != 'admin' and request.user != teacher.user:
             messages.error(request, "You don't have permission to request leave for this teacher.")
             return redirect('teachers:list')
     else:
-        # Teacher requesting leave for themselves
         try:
             teacher = request.user.teacher
         except Teacher.DoesNotExist:
@@ -199,12 +193,11 @@ def request_leave(request, pk=None):
 def manage_leaves(request):
     leaves = TeacherLeave.objects.select_related('teacher__user', 'approved_by').order_by('-applied_on')
     
-    # Filter by status
+
     status_filter = request.GET.get('status')
     if status_filter:
         leaves = leaves.filter(status=status_filter)
-    
-    # Pagination
+
     paginator = Paginator(leaves, 20)
     page_number = request.GET.get('page')
     leaves = paginator.get_page(page_number)
@@ -244,7 +237,7 @@ def approve_leave(request, leave_pk):
     
     return render(request, 'teachers/approve_leave.html', {'leave_request': leave_request})
 
-# AJAX Views
+
 @login_required
 def get_teachers_by_subject(request):
     """AJAX view to get teachers by subject"""
@@ -264,8 +257,6 @@ def get_teachers_by_subject(request):
 def bulk_import_teachers(request):
     """Bulk import teachers from CSV file"""
     if request.method == 'POST':
-        # Handle CSV file upload and processing
-        # This is a placeholder for bulk import functionality
         messages.info(request, 'Bulk import functionality coming soon!')
         return redirect('teachers:list')
     

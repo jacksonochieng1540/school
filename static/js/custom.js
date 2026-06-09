@@ -1,4 +1,3 @@
-// custom.js - School Management System
 document.addEventListener('DOMContentLoaded', function() {
     initializeSchoolManagementSystem();
 });

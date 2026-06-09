@@ -13,7 +13,7 @@ env/
 Scripts/
 bin/
 
-# IDEs and editors
+# IDEs 
 .vscode/
 .idea/
 

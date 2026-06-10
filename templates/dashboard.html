@@ -12,7 +12,6 @@
     </div>
 </div>
 
-<!-- Admin Dashboard -->
 {% if user.user_type == 'admin' %}
 <div class="row mb-4">
     <div class="col-md-3 mb-3">
@@ -29,7 +28,6 @@
                 </div>
             </div>
             <div class="card-footer">
-                <!-- MISSING URL: students:list -->
                 <a href="{% url 'students:list' %}" class="text-white text-decoration-none">
                     <small>View all students <i class="fas fa-arrow-right"></i></small>
                 </a>
@@ -51,7 +49,6 @@
                 </div>
             </div>
             <div class="card-footer">
-                <!-- MISSING URL: teachers:list -->
                 <a href="{% url 'teachers:list' %}" class="text-white text-decoration-none">
                     <small>View all teachers <i class="fas fa-arrow-right"></i></small>
                 </a>
@@ -73,7 +70,6 @@
                 </div>
             </div>
             <div class="card-footer">
-                <!-- MISSING URL: classes:list -->
                 <a href="{% url 'classes:list' %}" class="text-white text-decoration-none">
                     <small>View all classes <i class="fas fa-arrow-right"></i></small>
                 </a>
@@ -95,7 +91,6 @@
                 </div>
             </div>
             <div class="card-footer">
-                <!-- MISSING URL: subjects:list -->
                 <a href="{% url 'subjects:list' %}" class="text-dark text-decoration-none">
                     <small>View all subjects <i class="fas fa-arrow-right"></i></small>
                 </a>
@@ -104,8 +99,6 @@
     </div>
 </div>
 {% endif %}
-
-<!-- Teacher Dashboard -->
 {% if user.user_type == 'teacher' %}
 <div class="row mb-4">
     <div class="col-md-4 mb-3">
@@ -158,7 +151,6 @@
 </div>
 {% endif %}
 
-<!-- Student Dashboard -->
 {% if user.user_type == 'student' %}
 <div class="row mb-4">
     <div class="col-md-6 mb-3">
@@ -198,9 +190,7 @@
 </div>
 {% endif %}
 
-<!-- Main Content Row -->
 <div class="row">
-    <!-- Recent Activity / Quick Actions -->
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
@@ -273,7 +263,6 @@
         </div>
     </div>
     
-    <!-- Quick Actions Sidebar -->
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
@@ -284,19 +273,15 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     {% if user.user_type == 'admin' %}
-                        <!-- MISSING URL: students:add -->
                         <a href="{% url 'students:add' %}" class="btn btn-primary btn-sm">
                             <i class="fas fa-user-plus me-2"></i>Add New Student
                         </a>
-                        <!-- MISSING URL: teachers:add -->
                         <a href="{% url 'teachers:add' %}" class="btn btn-success btn-sm">
                             <i class="fas fa-user-tie me-2"></i>Add New Teacher
                         </a>
-                        <!-- MISSING URL: classes:add -->
                         <a href="{% url 'classes:add' %}" class="btn btn-info btn-sm">
                             <i class="fas fa-plus-circle me-2"></i>Create New Class
                         </a>
-                        <!-- MISSING URL: subjects:add -->
                         <a href="{% url 'subjects:add' %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-book-medical me-2"></i>Add New Subject
                         </a>
@@ -309,7 +294,6 @@
                         <a href="{% url 'grades:add' %}" class="btn btn-success btn-sm">
                             <i class="fas fa-plus-square me-2"></i>Add Grades
                         </a>
-                        <!-- INCORRECT URL: grades:exams (should be grades:exam_list) -->
                         <a href="{% url 'grades:exams' %}" class="btn btn-info btn-sm">
                             <i class="fas fa-file-alt me-2"></i>Create Exam
                         </a>
@@ -325,7 +309,6 @@
                     {% endif %}
                     
                     <hr>
-                    <!-- MISSING URL: accounts:profile -->
                     <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-user-edit me-2"></i>Update Profile
                     </a>
@@ -333,7 +316,6 @@
             </div>
         </div>
 
-        <!-- Calendar Widget -->
         <div class="card mt-3">
             <div class="card-header">
                 <h6 class="card-title mb-0">
@@ -353,14 +335,12 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Add fade-in animation to cards
     const cards = document.querySelectorAll('.card');
     cards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.1}s`;
         card.classList.add('fade-in');
     });
     
-    // Auto-hide messages after 5 seconds
     const alerts = document.querySelectorAll('.alert-dismissible');
     alerts.forEach(alert => {
         setTimeout(() => {
